@@ -16,7 +16,7 @@ RUN sudo mkdir ~/.vnc && \
 Xephyr -screen $VNC_RESOLUTION -ac $DISPLAY &
 midori
 EOF
-    chmod +x ~/.vnc/xstartup
+    RUN chmod +x ~/.vnc/xstartup
 
 # Expose VNC port
 EXPOSE $VNC_PORT
