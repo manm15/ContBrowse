@@ -2,7 +2,7 @@ FROM debian:stretch
 
 # Install packages
 RUN apt-get update && \
-    apt-get install -y midori tigervnc-standalone-server
+    apt-get install -y midori xserver-xephyr
 
 # Set up VNC
 ENV DISPLAY=:1
@@ -11,7 +11,7 @@ ENV VNC_RESOLUTION=1024x768
 RUN mkdir ~/.vnc && \
     echo "password" | vncpasswd -f > ~/.vnc/passwd && \
     chmod 600 ~/.vnc/passwd && \
-    echo "#!/bin/sh\nmidori &\nxterm" > ~/.vnc/xstartup && \
+    echo "#!/bin/sh\nXephyr -screen $VNC_RESOLUTION -ac $DISPLAY &\nmidori" > ~/.vnc/xstartup && \
     chmod +x ~/.vnc/xstartup
 
 # Expose VNC port
