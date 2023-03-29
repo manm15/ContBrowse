@@ -1,16 +1,21 @@
-FROM debian:buster-slim
+FROM debian:stretch
 
-# Install dependencies
-RUN apt-get update && apt-get install -y midori xrdp xfce4
+# Install packages
+RUN apt-get update && \
+    apt-get install -y midori tigervnc-standalone-server
 
-# Set up working directory
-WORKDIR /app
+# Set up VNC
+ENV DISPLAY=:1
+ENV VNC_PORT=5901
+ENV VNC_RESOLUTION=1024x768
+RUN mkdir ~/.vnc && \
+    echo "password" | vncpasswd -f > ~/.vnc/passwd && \
+    chmod 600 ~/.vnc/passwd && \
+    echo "#!/bin/sh\nmidori &\nxterm" > ~/.vnc/xstartup && \
+    chmod +x ~/.vnc/xstartup
 
-# Set up xRDP
-RUN echo "xfce4-session" > /etc/skel/.xsession
-RUN sed -i.bak '/fi/a #xrdp multiple users configuration \n xfce4-session \n' /etc/xrdp/startwm.sh
-RUN adduser xrdp ssl-cert
-RUN mkdir /var/run/xrdp && chown xrdp /var/run/xrdp
+# Expose VNC port
+EXPOSE $VNC_PORT
 
-# Start app
-CMD ["tail", "-f", "/dev/null"]
+# Start VNC server on container startup
+CMD vncserver $DISPLAY -geometry $VNC_RESOLUTION -depth 24 && tail -f /dev/null
