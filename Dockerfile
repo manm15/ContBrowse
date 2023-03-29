@@ -9,9 +9,13 @@ ENV DISPLAY=:1
 ENV VNC_PORT=5901
 ENV VNC_RESOLUTION=1024x768
 RUN sudo mkdir ~/.vnc && \
-    echo "password" | vncpasswd -f > ~/.vnc/passwd && \
+    sudo vncpasswd -f <<< "password\npassword\n" > ~/.vnc/passwd && \
     chmod 600 ~/.vnc/passwd && \
-    echo "#!/bin/bash\nXephyr -screen $VNC_RESOLUTION -ac $DISPLAY &\nmidori" > ~/.vnc/xstartup && \
+    sudo tee ~/.vnc/xstartup <<EOF >/dev/null
+#!/bin/bash
+Xephyr -screen $VNC_RESOLUTION -ac $DISPLAY &
+midori
+EOF
     chmod +x ~/.vnc/xstartup
 
 # Expose VNC port
